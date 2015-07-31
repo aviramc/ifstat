@@ -5,7 +5,8 @@ network interface satitstics
 ## Installation
 * Install from source (after cloning):
 ```bash
-sudo python setup.py```
+sudo python setup.py
+```
 
 * Install latest version from github:
 ```bash
