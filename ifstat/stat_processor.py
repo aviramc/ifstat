@@ -26,16 +26,16 @@ def _process_session_data(old_stats, new_stats, interval):
     sessions = []
     for session_key, raw_session_data in new_stats.iteritems():
         session_type, source_ip, source_port, dest_ip, dest_port = session_key
-        is_new = session_key in old_stats
+        is_new = session_key not in old_stats
         sessions.append(Session(type=session_type,
                                 source_ip=source_ip,
                                 source_port=source_port,
                                 dest_ip=dest_ip,
                                 dest_port=dest_port,
-                                is_dead=False,
+                                is_dead=raw_session_data.closed,
                                 is_new=is_new,
-                                rx_bps=(0 if not is_new else _rate_per_second(old_stats[session_key].rx_bytes, raw_session_data.rx_bytes, interval)),
-                                tx_bps=(0 if not is_new else _rate_per_second(old_stats[session_key].tx_bytes, raw_session_data.tx_bytes, interval)),
+                                rx_bps=(0 if is_new else _rate_per_second(old_stats[session_key].rx_bytes, raw_session_data.rx_bytes, interval)),
+                                tx_bps=(0 if is_new else _rate_per_second(old_stats[session_key].tx_bytes, raw_session_data.tx_bytes, interval)),
                                 time=raw_session_data.last_packet_time - raw_session_data.start_time))
 
     # XXX: Add sessions that don't exist anymore as dead
@@ -61,13 +61,13 @@ DataProcessors = {'device': _process_device_data,
 
 class StatProcessor(object):
     def __init__(self, stats):
-        self._raw_stats = stats
+        self._old_stats = stats
 
     def process_new_stats(self, new_stats, interval):
         processed_stats = {}
         for stat_type, processor in DataProcessors.iteritems():
-            processed_stats[stat_type] = processor(self._raw_stats[stat_type],
+            processed_stats[stat_type] = processor(self._old_stats[stat_type],
                                                    new_stats[stat_type],
                                                    interval)
-        self._raw_stats = new_stats
+        self._old_stats = new_stats
         return processed_stats
