@@ -1,6 +1,7 @@
-from .collectors import device
+from .collectors import device, sessions
 
 COLLECTORS = {'device': device.DeviceCollector,
+              'sessions': sessions.NetworkSessions,
              }
 
 class StatCollector(object):
@@ -13,7 +14,7 @@ class StatCollector(object):
             self._collectors[collector] = COLLECTORS[collector](device)
 
     def start(self):
-        for collector in self._collectors.itervalues():
+        for name, collector in self._collectors.iteritems():
             collector.start()
 
     def join(self):

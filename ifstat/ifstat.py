@@ -18,6 +18,7 @@ def main():
     # TODO: Verify the device exists
 
     collector = getstats.StatCollector(args.device)
+    collector.start()
     current_stats = collector.get_stats()
     stat_processor = StatProcessor(current_stats)
 

@@ -23,10 +23,16 @@ class DeviceCollector(object):
     def __init__(self, device):
         self._device = device
 
+    def run(self):
+        pass
+
     def start(self):
         pass
 
     def join(self):
+        pass
+
+    def stop(self):
         pass
 
     def _get_stat_from_file(self, stat_filename, stat_type):

@@ -20,7 +20,8 @@ setup(
     packages = find_packages(),
     long_description = read('README.md'),
     install_requires = [
-        # "requests == 2.6.0",
+        "pypcap == 1.1.3",
+        "dpkt == 1.8.6.2",
     ],
     include_package_data = True,
     entry_points = dict(
