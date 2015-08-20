@@ -112,11 +112,11 @@ def _clean_closed_sessions(stats, udp_session_timeout, tcp_session_timeout):
         if session.closed or current_time - session.last_packet_time > session_timeout:
             stats.pop(key)
 
-def process_sessions(device, stats, running, udp_session_timeout, tcp_session_timeout):
+def process_sessions(device, bpf_filter, stats, running, udp_session_timeout, tcp_session_timeout):
     # TODO: What's the snaplen required to capture everything?
-    # TODO: This is very inefficient
+    # TODO: This is very inefficient, packets can be lost
     pcap_object = pcap.pcap(device)
-    pcap_object.setfilter('tcp or udp')
+    pcap_object.setfilter(bpf_filter)
     for packet in pcap_object:
         if packet is None:
             _clean_closed_sessions(stats, udp_session_timeout, tcp_session_timeout)
@@ -131,11 +131,12 @@ def process_sessions(device, stats, running, udp_session_timeout, tcp_session_ti
     pcap_object.close()
 
 class NetworkSessions(Process):
-    def __init__(self, device, udp_session_timeout=10, tcp_session_timeout=120):
+    def __init__(self, device, bpf_filter='tcp or udp', udp_session_timeout=10, tcp_session_timeout=120):
         self._manager = Manager()
         self._stats = self._manager.dict()
         self._running = Value('b', False)
         self._device = device
+        self._bpf_filter = bpf_filter
         self._udp_session_timeout = udp_session_timeout
         self._tcp_session_timeout = tcp_session_timeout
 
@@ -150,6 +151,7 @@ class NetworkSessions(Process):
     def run(self):
         self._running.value = True
         process_sessions(self._device,
+                         self._bpf_filter,
                          self._stats,
                          self._running,
                          self._udp_session_timeout,
