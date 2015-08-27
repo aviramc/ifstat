@@ -57,10 +57,11 @@ class SessionsPad(object):
             rx_rate = _get_rate_string(session.rx_bps).ljust(14)
             tx_rate = _get_rate_string(session.tx_bps).ljust(14)
             length = "%.2s" % (session.time,)
-            
+            display_line = "| %s | %s | %s | %s | %s" % (session_type, details, rx_rate, tx_rate, length)
+            display_line = display_line.ljust(len(EMPTY_LINE))
             self._pad.addstr(i,
                              0,
-                              "| %s | %s | %s | %s | %s" % (session_type, details, rx_rate, tx_rate, length))
+                              display_line)
 
         sessions_printed = stop_index - start_index
         for i in xrange(sessions_printed + HEADER_LINES, self._sessions_number + HEADER_LINES):
