@@ -17,6 +17,10 @@ class StatCollector(object):
         for name, collector in self._collectors.iteritems():
             collector.start()
 
+    def stop(self):
+        for name, collector in self._collectors.iteritems():
+            collector.stop()
+
     def join(self):
         for collector in self._collectors.itervalues():
             collector.join()
