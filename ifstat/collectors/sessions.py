@@ -128,8 +128,6 @@ def process_sessions(device, bpf_filter, stats, running, udp_session_timeout, tc
         if not running.value:
             break
 
-    pcap_object.close()
-
 class NetworkSessions(Process):
     def __init__(self, device, bpf_filter='tcp or udp', udp_session_timeout=10, tcp_session_timeout=120):
         self._manager = Manager()
@@ -143,7 +141,7 @@ class NetworkSessions(Process):
         super(NetworkSessions, self).__init__()
 
     def stop(self):
-        self._running.value = True
+        self._running.value = False
 
     def get_stats(self):
         return deepcopy(self._stats)
