@@ -17,13 +17,12 @@ class StatCollector(object):
         for name, collector in self._collectors.iteritems():
             collector.start()
 
-    def stop(self):
+    def stop(self, timeout=0.1):
         for name, collector in self._collectors.iteritems():
             collector.stop()
-
-    def join(self):
-        for collector in self._collectors.itervalues():
-            collector.join()
+            collector.join(timeout)
+            if collector.is_alive():
+                collector.terminate()
 
     def get_stats(self):
         stats = {}

@@ -1,12 +1,11 @@
 import argparse
 import locale
 import curses
+import time
 
 from .stat_processor import StatProcessor
 from .display.sessions import SessionsPad
 from . import getstats
-
-DEFAULT_INTERVAL = 10
 
 def main():
     arg_parser = argparse.ArgumentParser(description="ifstat - network interface statistics utility")
@@ -26,20 +25,28 @@ def main():
     sessions_pad = SessionsPad()
     curses.noecho()
     curses.cbreak()
-    curses.halfdelay(DEFAULT_INTERVAL)
+    curses.curs_set(0)
+    # XXX: halfdelay is in tenths of seconds
+    curses.halfdelay(int(args.interval * 10))
+    last_time = time.time()
+    current_stats = {"device": {}, "sessions": []}
     try:
         running = True
         while running:
-            raw_stats = collector.get_stats()
-            current_stats = stat_processor.process_new_stats(raw_stats, args.interval)
+            # XXX: Get & process new stats only when the intervals have passed
+            current_time = time.time()
+            if current_time - last_time >= args.interval:
+                raw_stats = collector.get_stats()
+                current_stats = stat_processor.process_new_stats(raw_stats, args.interval)
+                last_time = current_time
 
             sessions_pad.display(current_stats["sessions"])
             key = window.getch()
 
             if key == ord('q'):
                 collector.stop()
-                collector.join()
                 running = False
+
     finally:
         curses.nocbreak()
         curses.echo()
