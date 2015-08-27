@@ -29,10 +29,16 @@ class DeviceCollector(object):
     def start(self):
         pass
 
-    def join(self):
+    def join(self, timeout):
         pass
 
     def stop(self):
+        pass
+
+    def is_alive(self):
+        return False
+
+    def terminate(self):
         pass
 
     def _get_stat_from_file(self, stat_filename, stat_type):
