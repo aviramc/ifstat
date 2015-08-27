@@ -1,12 +1,11 @@
 import argparse
+import locale
+import curses
 import time
 
 from .stat_processor import StatProcessor
+from .display.sessions import SessionsPad
 from . import getstats
-
-#~~~
-from pprint import pprint
-#~~~
 
 def main():
     arg_parser = argparse.ArgumentParser(description="ifstat - network interface statistics utility")
@@ -19,10 +18,20 @@ def main():
 
     collector = getstats.StatCollector(args.device)
     collector.start()
-    current_stats = collector.get_stats()
-    stat_processor = StatProcessor(current_stats)
+    raw_stats = collector.get_stats()
+    stat_processor = StatProcessor(raw_stats)
 
-    while True:
-        time.sleep(args.interval)
-        current_stats = collector.get_stats()
-        pprint(stat_processor.process_new_stats(current_stats, args.interval))
+    window = curses.initscr()
+    sessions_pad = SessionsPad()
+    curses.noecho()
+    try:
+        while True:
+            time.sleep(args.interval)
+            raw_stats = collector.get_stats()
+            current_stats = stat_processor.process_new_stats(raw_stats, args.interval)
+
+            sessions_pad.display(current_stats["sessions"])
+
+    finally:
+        curses.echo()
+        curses.endwin()
