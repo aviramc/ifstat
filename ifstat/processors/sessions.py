@@ -1,6 +1,7 @@
 from collections import namedtuple
 
-Session = namedtuple('Session', ['type', 'source_ip', 'source_port', 'dest_ip', 'dest_port', 'is_dead', 'is_new', 'rx_bps', 'tx_bps', 'time'])
+# key field is used for sorting purposes
+Session = namedtuple('Session', ['key', 'type', 'source_ip', 'source_port', 'dest_ip', 'dest_port', 'is_dead', 'is_new', 'rx_bps', 'tx_bps', 'time'])
 
 def _rate_per_second(old_stat, new_stat, interval):
     return (new_stat - old_stat) / (1.0 / interval)
@@ -10,7 +11,8 @@ def process(old_stats, new_stats, interval):
     for session_key, raw_session_data in new_stats.iteritems():
         session_type, source_ip, source_port, dest_ip, dest_port = session_key
         is_new = session_key not in old_stats
-        sessions.append(Session(type=session_type,
+        sessions.append(Session(key=session_key,
+                                type=session_type,
                                 source_ip=source_ip,
                                 source_port=source_port,
                                 dest_ip=dest_ip,
@@ -25,7 +27,8 @@ def process(old_stats, new_stats, interval):
     for session_key, raw_session_data in old_stats.iteritems():
         session_type, source_ip, source_port, dest_ip, dest_port = session_key
         if session_key not in new_stats:
-            sessions.append(Session(type=session_type,
+            sessions.append(Session(key=session_key,
+                                    type=session_type,
                                     source_ip=source_ip,
                                     source_port=source_port,
                                     dest_ip=dest_ip,
