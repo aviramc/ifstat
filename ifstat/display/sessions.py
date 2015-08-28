@@ -24,10 +24,11 @@ def _get_rate_string(rate_bps):
     return "%7.2f %4s" % (current_rate_value, current_rate_name)
 
 class SessionsPad(object):
-    def __init__(self, sessions_number=20, ylocation=0, xlocation=0):
+    def __init__(self, sessions_number=20, ylocation=0, xlocation=0, colors=None):
         self._sessions_number = sessions_number
         self._ylocation = ylocation
         self._xlocation = xlocation
+        self._colors = colors
         self._top_line = 0
         self._pad = curses.newpad(self._sessions_number + EXTRA_LINES, PAD_X_SIZE)
         self._pad.addstr(0, 0, SESSIONS_BORDER)
@@ -43,6 +44,17 @@ class SessionsPad(object):
 
     def get_x_size(self):
         return PAD_X_SIZE
+
+    def _get_session_color(self, session):
+        if self._colors is None:
+            return 0
+
+        if session.is_new:
+            return curses.color_pair(self._colors["green"])
+        if session.is_dead:
+            return curses.color_pair(self._colors["red"])
+
+        return 0
 
     def display(self, sessions, sortby='key'):
         if sortby is not None:
@@ -61,7 +73,8 @@ class SessionsPad(object):
             display_line = display_line.ljust(len(EMPTY_LINE))
             self._pad.addstr(i,
                              0,
-                              display_line)
+                             display_line,
+                             self._get_session_color(session))
 
         sessions_printed = stop_index - start_index
         for i in xrange(sessions_printed + HEADER_LINES, self._sessions_number + HEADER_LINES):

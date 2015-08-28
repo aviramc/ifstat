@@ -7,6 +7,21 @@ from .stat_processor import StatProcessor
 from .display.sessions import SessionsPad
 from . import getstats
 
+
+def _init_colors():
+    colors = {}
+    curses.start_color()
+    curses.use_default_colors()
+    curses_colors = {"green": curses.COLOR_GREEN,
+                     "yellow": curses.COLOR_YELLOW,
+                     "red": curses.COLOR_RED,
+                     "cyan": curses.COLOR_CYAN,
+                    }
+    for index, (color_name, curses_color) in enumerate(curses_colors.iteritems()):
+        curses.init_pair(index + 1, curses_color, -1)
+        colors[color_name] = index + 1
+    return colors
+
 def main():
     arg_parser = argparse.ArgumentParser(description="ifstat - network interface statistics utility")
     arg_parser.add_argument(dest='device', help='The device name to get stats for')
@@ -22,13 +37,14 @@ def main():
     stat_processor = StatProcessor(raw_stats)
 
     window = curses.initscr()
-    sessions_pad = SessionsPad()
     curses.noecho()
     curses.cbreak()
     curses.curs_set(0)
     # XXX: halfdelay is in tenths of seconds
     curses.halfdelay(int(args.interval * 10))
+    colors = _init_colors()
     last_time = time.time()
+    sessions_pad = SessionsPad(colors=colors)
     current_stats = {"device": {}, "sessions": []}
     try:
         running = True
