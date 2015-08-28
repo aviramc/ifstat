@@ -23,6 +23,11 @@ def _get_rate_string(rate_bps):
 
     return "%7.2f %4s" % (current_rate_value, current_rate_name)
 
+def _get_time_string(time_seconds):
+    return "%02d:%02d:%02d" % (int(time_seconds / 60 / 60),
+                               int(time_seconds / 60),
+                               int(time_seconds))
+
 class SessionsPad(object):
     def __init__(self, sessions_number=20, ylocation=0, xlocation=0, colors=None):
         self._sessions_number = sessions_number
@@ -68,8 +73,8 @@ class SessionsPad(object):
             details = ("%s:%d --> %s:%d" % (session.source_ip, session.source_port, session.dest_ip, session.dest_port)).ljust(47)
             rx_rate = _get_rate_string(session.rx_bps).ljust(14)
             tx_rate = _get_rate_string(session.tx_bps).ljust(14)
-            length = "%.2s" % (session.time,)
-            display_line = "| %s | %s | %s | %s | %s" % (session_type, details, rx_rate, tx_rate, length)
+            time_string = _get_time_string(session.time)
+            display_line = "| %s | %s | %s | %s | %s" % (session_type, details, rx_rate, tx_rate, time_string)
             display_line = display_line.ljust(len(EMPTY_LINE))
             self._pad.addstr(i,
                              0,
