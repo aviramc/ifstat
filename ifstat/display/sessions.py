@@ -41,6 +41,7 @@ class SessionsPad(object):
         self._pad.addstr(2, 0, SESSIONS_BORDER)
         self._pad.addstr(HEADER_LINES + self._sessions_number, 0, SESSIONS_BORDER)
         self._sort_by = 'key'
+        self._sort_reverse = True
 
     def key(self, key):
         if key == curses.KEY_DOWN:
@@ -73,12 +74,11 @@ class SessionsPad(object):
         if len(sessions) <= self._sessions_number:
             self._top_line = 0
         
-        sessions = sorted(sessions, cmp=lambda x, y: cmp(getattr(x, self._sort_by), getattr(y, self._sort_by)))[:1000]
+        sessions.sort(key=lambda x: getattr(x, self._sort_by), reverse=self._sort_reverse)
 
         start_index = self._top_line
         stop_index = min(len(sessions), self._sessions_number + self._top_line)
         
-        self._pad.addstr(0, 0, "%d %d %d" % (len(sessions), start_index, stop_index))
         for i, session in enumerate(islice(sessions, start_index, stop_index)):
             index = start_index + i + 1
             line_number = i + HEADER_LINES
