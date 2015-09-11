@@ -11,6 +11,8 @@ import dpkt
 import pcap
 import time
 
+CLEAN_AFTER_CLOSE_TIME = 2
+
 # TCP/UDP session descriptor
 Session = namedtuple('Session', ['start_time',
                                  'last_packet_time',
@@ -90,6 +92,8 @@ def _process_packet(packet, stats):
         rx_bytes = stats[key].rx_bytes + _get_new_rx_bytes(packet_data, side)
         tx_bytes = stats[key].tx_bytes + _get_new_tx_bytes(packet_data, side)
         last_packet_time = time.time()
+        if stats[key].closed:
+            closed = True
     else:
         start_time = last_packet_time = time.time()
         rx_bytes = _get_new_rx_bytes(packet_data, side)
@@ -109,7 +113,10 @@ def _clean_closed_sessions(stats, udp_session_timeout, tcp_session_timeout):
         session = stats[key]
 
         session_timeout = udp_session_timeout if session_type == 'udp' else tcp_session_timeout
-        if session.closed or current_time - session.last_packet_time > session_timeout:
+        # if session.closed or current_time - session.last_packet_time > session_timeout:
+        if current_time - session.last_packet_time > session_timeout:
+            stats.pop(key)
+        if session.closed and current_time - session.last_packet_time > CLEAN_AFTER_CLOSE_TIME:
             stats.pop(key)
 
 def process_sessions(device, bpf_filter, stats, running, udp_session_timeout, tcp_session_timeout):
