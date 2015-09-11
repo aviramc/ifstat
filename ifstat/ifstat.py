@@ -40,6 +40,7 @@ def main():
     curses.noecho()
     curses.cbreak()
     curses.curs_set(0)
+    window.keypad(1)
     # XXX: halfdelay is in tenths of seconds
     curses.halfdelay(int(args.interval * 10))
     colors = _init_colors()
@@ -59,6 +60,8 @@ def main():
             sessions_pad.display(current_stats["sessions"])
             key = window.getch()
 
+            if key != -1:
+                sessions_pad.key(key)
             if key == ord('q'):
                 collector.stop()
                 running = False
