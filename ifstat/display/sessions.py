@@ -28,6 +28,25 @@ def _get_time_string(time_seconds):
                                int(time_seconds / 60),
                                int(time_seconds) % 60)
 
+SORT_KEYS = {'r': ('rx_bps', True),
+             'R': ('rx_bps', False),
+             't': ('tx_bps', True),
+             'T': ('tx_bps', False),
+             's': ('source_ip', True),
+             'S': ('source_ip', False),
+             'p': ('source_port', True),
+             'P': ('source_port', False),
+             'd': ('dest_ip', True),
+             'D': ('dest_ip', False),
+             '{': ('dest_port', True),
+             '[': ('dest_port', False),
+             'l': ('time', True),
+             'L': ('time', False),
+             'k': ('key', True),
+             'K': ('key', False),
+            }
+SORT_KEYS_ORDINALS = [ord(key) for key in SORT_KEYS]
+
 class SessionsPad(object):
     def __init__(self, sessions_number=20, ylocation=0, xlocation=0, colors=None):
         self._sessions_number = sessions_number
@@ -47,11 +66,18 @@ class SessionsPad(object):
         if key == curses.KEY_DOWN:
             if self._top_line < self._sessions_number:
                 self._top_line += 1
+            return
 
         if key == curses.KEY_UP:
             self._top_line -= 1
             if self._top_line < 0:
                 self._top_line = 0
+            return
+
+        if key in SORT_KEYS_ORDINALS:
+            key = chr(key)
+            self._sort_by, self._sort_reverse = SORT_KEYS[key]
+            return
 
     def get_y_size(self):
         return EXTRA_LINES + self._sessions_number
