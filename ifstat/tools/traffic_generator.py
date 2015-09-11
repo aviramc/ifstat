@@ -5,6 +5,7 @@ import signal
 import socket
 import time
 import os
+import re
 
 BIND_ADDRESS = '127.0.0.1'
 BASE_PORT = 2570
@@ -80,7 +81,19 @@ def _get_command_indices(pairs, options):
     else:
         list_indices = [int(index)
                         for index in options
-                         if index.isdigit() and int(index) < len(pairs)]
+                        if index.isdigit()]
+        range_indices_strings = [range_expression
+                                 for range_expression in options
+                                 if re.match(r'\d+-\d+', range_expression)]
+        range_indices = []
+        for range_indice_string in range_indices_strings:
+            start, end = (int(i) for i in range_indice_string.split('-'))
+            range_indices.extend(range(start, end + 1))
+        list_indices.extend(range_indices)
+        list_indices = set(list_indices)
+
+        list_indices = [index for index in list_indices
+                        if index < len(pairs)]
 
     return list_indices
         
