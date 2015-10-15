@@ -1,6 +1,8 @@
 import curses
 from itertools import islice, izip
 
+from .rate import get_rate_string
+
 SESSIONS_HEADER = "| Idx | Type | Details                                         | RX Rate        | TX Rate        | Time              "
 SESSIONS_BORDER = "+-----+------+-------------------------------------------------+----------------+----------------+-------------------"
 EMPTY_LINE = "|     |      |                                                 |                |                |                   "
@@ -8,20 +10,6 @@ PAD_X_SIZE = len(SESSIONS_HEADER) + 1
 HEADER_LINES = 3
 FOOTER_LINES = 1
 EXTRA_LINES = HEADER_LINES + FOOTER_LINES
-
-def _get_rate_string(rate_bps):
-    levels = ['KBps', 'MBps', 'GBps']
-    rate_thresholds = [1024, ] * len(levels)
-
-    current_rate_value = rate_bps
-    current_rate_name = 'Bps'
-    for rate_name, rate_threshold in izip(levels, rate_thresholds):
-        if current_rate_value < rate_threshold:
-            break
-        current_rate_value = current_rate_value / rate_threshold
-        current_rate_name = rate_name
-
-    return "%7.2f %4s" % (current_rate_value, current_rate_name)
 
 def _get_time_string(time_seconds):
     return "%02d:%02d:%02d" % (int(time_seconds / 60 / 60),
@@ -110,8 +98,8 @@ class SessionsPad(object):
             line_number = i + HEADER_LINES
             session_type = session.type.ljust(4).upper()
             details = ("%s:%d --> %s:%d" % (session.source_ip, session.source_port, session.dest_ip, session.dest_port)).ljust(47)
-            rx_rate = _get_rate_string(session.rx_bps).ljust(14)
-            tx_rate = _get_rate_string(session.tx_bps).ljust(14)
+            rx_rate = get_rate_string(session.rx_bps).ljust(14)
+            tx_rate = get_rate_string(session.tx_bps).ljust(14)
             time_string = _get_time_string(session.time)
             display_line = "| %3d | %s | %s | %s | %s | %s" % (index, session_type, details, rx_rate, tx_rate, time_string)
             display_line = display_line.ljust(len(EMPTY_LINE))

@@ -1,5 +1,7 @@
 import curses
 
+from .rate import get_rate_string
+
 FOOTER_LINE = "+--------------------------------------------------------------------------------------------------------------------"
 PAD_X_SIZE = len(FOOTER_LINE) + 1
 
@@ -49,10 +51,12 @@ class DevicePad(object):
         self._pad.addstr(line, 0, "|")
 
     def _display_rx_stats_line(self, line, stats):
-        self._pad.addstr(line, 0, "| RX Rate: %7.2f Bps  RX Error rate: %d Eps" % (stats['rx_bps'], stats['rx_errors_bps']))
+        self._pad.addstr(line, 0, "| RX Rate: %s Bps  RX Error rate: %d Eps" % (get_rate_string(stats['rx_bps']),
+                                                                                stats['rx_errors_bps']))
 
     def _display_tx_stats_line(self, line, stats):
-        self._pad.addstr(line, 0, "| TX Rate: %7.2f Bps  TX Error rate: %d Eps" % (stats['tx_bps'], stats['tx_errors_bps']))
+        self._pad.addstr(line, 0, "| TX Rate: %s Bps  TX Error rate: %d Eps" % (get_rate_string(stats['tx_bps']),
+                                                                                stats['tx_errors_bps']))
 
     def display(self, stats):
         if not stats:
