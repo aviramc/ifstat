@@ -1,5 +1,6 @@
 import curses
 
+from .pad_display_manager import PadDisplayManager
 from .rate import get_rate_string
 
 FOOTER_LINE = "+--------------------------------------------------------------------------------------------------------------------"
@@ -9,8 +10,6 @@ class DevicePad(object):
     def __init__(self, device_name, speed_graph_height=10, ylocation=0, xlocation=0, colors=None):
         self._device_name = device_name
         self._speed_graph_height = speed_graph_height
-        self._ylocation = ylocation
-        self._xlocation = xlocation
         self._colors = colors
 
         self._stats_display_functions = [self._display_footer_line,
@@ -23,6 +22,7 @@ class DevicePad(object):
                                         ]
 
         self._pad = curses.newpad(self.get_y_size(), self.get_x_size())
+        self._pad_display_manager = PadDisplayManager(ylocation, xlocation)
 
     def get_x_size(self):
         return PAD_X_SIZE + 1
@@ -35,7 +35,7 @@ class DevicePad(object):
         return self._speed_graph_height + 1 + len(self._stats_display_functions)
 
     def key(self, key):
-        pass
+        self._pad_display_manager.key(key)
 
     def _display_device_stats(self, start_line, stats):
         for current_line, display_function in enumerate(self._stats_display_functions, start=start_line):
@@ -58,7 +58,7 @@ class DevicePad(object):
         self._pad.addstr(line, 0, "| TX Rate: %s Bps  TX Error rate: %d Eps" % (get_rate_string(stats['tx_bps']),
                                                                                 stats['tx_errors_bps']))
 
-    def display(self, stats):
+    def display(self, maxy, maxx, stats):
         if not stats:
             return
         # TODO: Speed graph.
@@ -68,9 +68,8 @@ class DevicePad(object):
 
         self._display_device_stats(current_line, stats)
 
-        self._pad.refresh(0,
-                          0,
-                          self._ylocation,
-                          self._xlocation,
-                          self._ylocation + self.get_y_size(),
-                          self._xlocation + self.get_x_size())
+        self._pad_display_manager.refresh(self._pad,
+                                          maxy,
+                                          maxx,
+                                          self.get_y_size(),
+                                          self.get_x_size())

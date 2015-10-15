@@ -63,12 +63,14 @@ def main():
                 current_stats = stat_processor.process_new_stats(raw_stats, args.interval)
                 last_time = current_time
 
-            sessions_pad.display(current_stats["sessions"])
-            device_pad.display(current_stats["device"])
+            maxy, maxx = window.getmaxyx()
+            sessions_pad.display(maxy, maxx, current_stats["sessions"])
+            device_pad.display(maxy, maxx, current_stats["device"])
             key = window.getch()
 
             if key != -1:
                 sessions_pad.key(key)
+                device_pad.key(key)
             if key == ord('q'):
                 collector.stop()
                 running = False

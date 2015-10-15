@@ -1,6 +1,7 @@
 import curses
 from itertools import islice, izip
 
+from .pad_display_manager import PadDisplayManager
 from .rate import get_rate_string
 
 SESSIONS_HEADER = "| Idx | Type | Details                                         | RX Rate        | TX Rate        | Time              "
@@ -38,8 +39,6 @@ SORT_KEYS_ORDINALS = [ord(key) for key in SORT_KEYS]
 class SessionsPad(object):
     def __init__(self, sessions_number=20, ylocation=0, xlocation=0, colors=None):
         self._sessions_number = sessions_number
-        self._ylocation = ylocation
-        self._xlocation = xlocation
         self._colors = colors
         self._top_line = 0
         self._pad = curses.newpad(self._sessions_number + EXTRA_LINES, PAD_X_SIZE)
@@ -49,8 +48,11 @@ class SessionsPad(object):
         self._pad.addstr(HEADER_LINES + self._sessions_number, 0, SESSIONS_BORDER)
         self._sort_by = 'key'
         self._sort_reverse = True
+        self._pad_display_manager = PadDisplayManager(ylocation, xlocation)
 
     def key(self, key):
+        self._pad_display_manager.key(key)
+
         if key == curses.KEY_DOWN:
             if self._top_line < self._sessions_number:
                 self._top_line += 1
@@ -84,7 +86,7 @@ class SessionsPad(object):
 
         return 0
 
-    def display(self, sessions):
+    def display(self, maxy, maxx, sessions):
         if len(sessions) <= self._sessions_number:
             self._top_line = 0
         
@@ -112,9 +114,24 @@ class SessionsPad(object):
         for i in xrange(sessions_printed + HEADER_LINES, self._sessions_number + HEADER_LINES):
             self._pad.addstr(i, 0, EMPTY_LINE)
 
-        self._pad.refresh(0,
-                          0,
-                          self._ylocation,
-                          self._xlocation,
-                          self._ylocation + self.get_y_size(),
-                          self._xlocation + self.get_x_size())
+        self._pad_display_manager.refresh(self._pad,
+                                          maxy,
+                                          maxx,
+                                          self.get_y_size(),
+                                          self.get_x_size())
+        # self._pad.refresh(0,
+        #                   0,
+        #                   self._ylocation,
+        #                   self._xlocation,
+        #                   self._ylocation + self.get_y_size(),
+        #                   self._xlocation + self.get_x_size())
+        # refresh parameters:
+        #   y coordinate in the pad to start with
+        #   x corrdinate in the pad to start with
+        #   (y1, x1) --> (y2, x2) - the on the window in which the pad should be drawn
+        # self._pad.refresh(0,
+        #                   0,
+        #                   self._ylocation,
+        #                   self._xlocation,
+        #                   self._ylocation + self.get_y_size(),
+        #                   min(maxx - 1, self._xlocation + self.get_x_size()))
