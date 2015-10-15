@@ -7,6 +7,7 @@ import sys
 
 from .stat_processor import StatProcessor
 from .display.sessions import SessionsPad
+from .display.device import DevicePad
 from . import getstats
 
 
@@ -50,6 +51,7 @@ def main():
     colors = _init_colors()
     last_time = time.time()
     sessions_pad = SessionsPad(colors=colors)
+    device_pad = DevicePad(args.device, colors=colors, ylocation=sessions_pad.get_y_size())
     current_stats = {"device": {}, "sessions": []}
     try:
         running = True
@@ -62,6 +64,7 @@ def main():
                 last_time = current_time
 
             sessions_pad.display(current_stats["sessions"])
+            device_pad.display(current_stats["device"])
             key = window.getch()
 
             if key != -1:
