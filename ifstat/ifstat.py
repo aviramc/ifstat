@@ -2,6 +2,8 @@ import argparse
 import locale
 import curses
 import time
+import pcap
+import sys
 
 from .stat_processor import StatProcessor
 from .display.sessions import SessionsPad
@@ -29,7 +31,9 @@ def main():
 
     args = arg_parser.parse_args()
 
-    # TODO: Verify the device exists
+    if args.device not in pcap.findalldevs():
+        sys.stderr.write('Error: No such device %s \n' % (args.device, ))
+        return
 
     collector = getstats.StatCollector(args.device)
     collector.start()
