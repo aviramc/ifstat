@@ -41,6 +41,7 @@ def main():
     raw_stats = collector.get_stats()
     stat_processor = StatProcessor(raw_stats)
 
+    locale.setlocale(locale.LC_ALL, '')
     window = curses.initscr()
     curses.noecho()
     curses.cbreak()
