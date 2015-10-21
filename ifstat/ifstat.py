@@ -52,7 +52,7 @@ def main():
     colors = _init_colors()
     last_time = time.time()
     sessions_pad = SessionsPad(colors=colors)
-    device_pad = DevicePad(args.device, colors=colors, ylocation=sessions_pad.get_y_size())
+    device_pad = DevicePad(args.device, args.interval, colors=colors, ylocation=sessions_pad.get_y_size())
     current_stats = {"device": {}, "sessions": []}
     try:
         running = True

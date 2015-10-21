@@ -13,8 +13,9 @@ FULL_BAR_SYMBOL = u'\u2588'.encode('UTF-8')
 HALF_BAR_SYMBOL = u'\u2584'.encode('UTF-8')
 
 class DevicePad(object):
-    def __init__(self, device_name, rate_graph_height=10, ylocation=0, xlocation=0, colors=None):
+    def __init__(self, device_name, refresh_interval, rate_graph_height=10, ylocation=0, xlocation=0, colors=None):
         self._device_name = device_name
+        self._refresh_interval = refresh_interval
         self._rate_graph_height = rate_graph_height
         self._colors = colors
 
@@ -55,7 +56,7 @@ class DevicePad(object):
         self._pad.addstr(line, 0, FOOTER_LINE)
 
     def _display_device_line(self, line, stats):
-        self._pad.addstr(line, 0, "| Device: %s" % (self._device_name,))
+        self._pad.addstr(line, 0, "| Device: %s          Refresh every %.2f seconds" % (self._device_name, self._refresh_interval))
 
     def _display_empty_line(self, line, stats):
         self._pad.addstr(line, 0, "|")
