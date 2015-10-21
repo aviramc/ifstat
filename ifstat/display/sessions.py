@@ -4,7 +4,7 @@ from itertools import islice, izip
 from .pad_display_manager import PadDisplayManager
 from .rate import get_rate_string
 
-SESSIONS_HEADER = "| Idx | Type | Details                                         | RX Rate        | TX Rate        | Time              "
+SESSIONS_HEADER = "| Idx | Type | Details                                         | RX Rate        | TX Rate        | Activity Time     "
 SESSIONS_BORDER = "+-----+------+-------------------------------------------------+----------------+----------------+-------------------"
 EMPTY_LINE = "|     |      |                                                 |                |                |                   "
 PAD_X_SIZE = len(SESSIONS_HEADER) + 1
