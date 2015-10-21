@@ -8,9 +8,9 @@ class PadDisplayManager(object):
         self._yoffset = 0
 
     def key(self, key):
-        if key == curses.KEY_RIGHT and self._xoffset > 0:
+        if key == curses.KEY_LEFT and self._xoffset > 0:
             self._xoffset -= 1
-        if key == curses.KEY_LEFT:
+        if key == curses.KEY_RIGHT:
             self._xoffset += 1
 
     def refresh(self, pad, maxy, maxx, ysize, xsize):
