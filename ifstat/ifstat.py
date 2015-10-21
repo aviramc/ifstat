@@ -63,9 +63,10 @@ def main():
                 current_stats = stat_processor.process_new_stats(raw_stats, args.interval)
                 last_time = current_time
 
-            maxy, maxx = window.getmaxyx()
-            sessions_pad.display(maxy, maxx, current_stats["sessions"])
-            device_pad.display(maxy, maxx, current_stats["device"])
+                maxy, maxx = window.getmaxyx()
+                sessions_pad.display(maxy, maxx, current_stats["sessions"])
+                device_pad.display(maxy, maxx, current_stats["device"])
+
             key = window.getch()
 
             if key != -1:
