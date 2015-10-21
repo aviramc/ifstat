@@ -14,7 +14,7 @@ class PadDisplayManager(object):
             self._xoffset += 1
 
     def refresh(self, pad, maxy, maxx, ysize, xsize):
-        if self._ylocation > maxy:
+        if self._ylocation >= maxy:
             return
 
         smaxrow = self._ylocation + ysize
