@@ -99,7 +99,7 @@ class SessionsPad(object):
             index = start_index + i + 1
             line_number = i + HEADER_LINES
             session_type = session.type.ljust(4).upper()
-            details = ("%s:%d --> %s:%d" % (session.source_ip, session.source_port, session.dest_ip, session.dest_port)).ljust(47)
+            details = ("%s:%d <-> %s:%d" % (session.source_ip, session.source_port, session.dest_ip, session.dest_port)).ljust(47)
             rx_rate = get_rate_string(session.rx_bps).ljust(14)
             tx_rate = get_rate_string(session.tx_bps).ljust(14)
             time_string = _get_time_string(session.time)
