@@ -119,19 +119,3 @@ class SessionsPad(object):
                                           maxx,
                                           self.get_y_size(),
                                           self.get_x_size())
-        # self._pad.refresh(0,
-        #                   0,
-        #                   self._ylocation,
-        #                   self._xlocation,
-        #                   self._ylocation + self.get_y_size(),
-        #                   self._xlocation + self.get_x_size())
-        # refresh parameters:
-        #   y coordinate in the pad to start with
-        #   x corrdinate in the pad to start with
-        #   (y1, x1) --> (y2, x2) - the on the window in which the pad should be drawn
-        # self._pad.refresh(0,
-        #                   0,
-        #                   self._ylocation,
-        #                   self._xlocation,
-        #                   self._ylocation + self.get_y_size(),
-        #                   min(maxx - 1, self._xlocation + self.get_x_size()))
