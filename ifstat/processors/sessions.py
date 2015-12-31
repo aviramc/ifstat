@@ -1,10 +1,9 @@
 from collections import namedtuple
 
+from .processing_utils import stat_per_interval
+
 # key field is used for sorting purposes
 Session = namedtuple('Session', ['key', 'type', 'source_ip', 'source_port', 'dest_ip', 'dest_port', 'is_dead', 'is_new', 'rx_bps', 'tx_bps', 'time'])
-
-def _rate_per_second(old_stat, new_stat, interval):
-    return (new_stat - old_stat) / (1.0 / interval)
 
 def process(old_stats, new_stats, interval):
     sessions = []
@@ -19,8 +18,8 @@ def process(old_stats, new_stats, interval):
                                 dest_port=dest_port,
                                 is_dead=raw_session_data.closed,
                                 is_new=is_new,
-                                rx_bps=(0 if is_new else _rate_per_second(old_stats[session_key].rx_bytes, raw_session_data.rx_bytes, interval)),
-                                tx_bps=(0 if is_new else _rate_per_second(old_stats[session_key].tx_bytes, raw_session_data.tx_bytes, interval)),
+                                rx_bps=(0 if is_new else stat_per_interval(old_stats[session_key].rx_bytes, raw_session_data.rx_bytes, interval)),
+                                tx_bps=(0 if is_new else stat_per_interval(old_stats[session_key].tx_bytes, raw_session_data.tx_bytes, interval)),
                                 time=raw_session_data.last_packet_time - raw_session_data.start_time))
 
     # XXX: Add sessions that don't exist anymore as dead
