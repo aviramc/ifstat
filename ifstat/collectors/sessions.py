@@ -77,7 +77,6 @@ def _get_new_tx_bytes(packet_data, side):
     return 0
 
 def _process_packet(packet, stats):
-    # TODO: If the packet is TCP, remove after FIN/RST
     packet_data = _parse_packet(packet)
     if packet_data is None:
         return
@@ -119,24 +118,25 @@ def _clean_closed_sessions(stats, udp_session_timeout, tcp_session_timeout):
         if session.closed and current_time - session.last_packet_time > CLEAN_AFTER_CLOSE_TIME:
             stats.pop(key)
 
-def process_sessions(device, bpf_filter, stats, running, udp_session_timeout, tcp_session_timeout):
+def process_sessions(device, bpf_filter, stats, running, udp_session_timeout, tcp_session_timeout, packet_timeout_ms):
     # TODO: What's the snaplen required to capture everything?
     # TODO: This is very inefficient, packets can be lost
-    pcap_object = pcap.pcap(device)
+    pcap_object = pcap.pcap(name=device, timeout_ms=packet_timeout_ms)
     pcap_object.setfilter(bpf_filter)
     for packet in pcap_object:
+        if not running.value:
+            break
+
         if packet is None:
             _clean_closed_sessions(stats, udp_session_timeout, tcp_session_timeout)
             continue
+
         packet_time, packet_data = packet
         _process_packet(packet_data, stats)
         _clean_closed_sessions(stats, udp_session_timeout, tcp_session_timeout)
 
-        if not running.value:
-            break
-
 class NetworkSessions(Process):
-    def __init__(self, device, bpf_filter='tcp or udp', udp_session_timeout=10, tcp_session_timeout=120):
+    def __init__(self, device, bpf_filter='tcp or udp', udp_session_timeout=10, tcp_session_timeout=120, packet_timeout_ms=1000):
         self._manager = Manager()
         self._stats = self._manager.dict()
         self._running = Value('b', False)
@@ -144,6 +144,7 @@ class NetworkSessions(Process):
         self._bpf_filter = bpf_filter
         self._udp_session_timeout = udp_session_timeout
         self._tcp_session_timeout = tcp_session_timeout
+        self._packet_timeout = packet_timeout_ms
 
         super(NetworkSessions, self).__init__()
 
@@ -160,4 +161,5 @@ class NetworkSessions(Process):
                          self._stats,
                          self._running,
                          self._udp_session_timeout,
-                         self._tcp_session_timeout)
+                         self._tcp_session_timeout,
+                         self._packet_timeout)
