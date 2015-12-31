@@ -120,7 +120,7 @@ def _get_graph_symbol(current_height, total_height, rate, max_rate):
 
 def _get_graph_string_for_line(current_height, total_height, max_value, history):
     if max_value == 0:
-        return ''
+        return ' '
 
     height_ratio = float(current_height) / total_height
     current_position = 0
