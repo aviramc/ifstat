@@ -119,8 +119,8 @@ def _clean_closed_sessions(stats, udp_session_timeout, tcp_session_timeout):
             stats.pop(key)
 
 def process_sessions(device, bpf_filter, stats, running, udp_session_timeout, tcp_session_timeout, packet_timeout_ms):
-    # TODO: What's the snaplen required to capture everything?
-    # TODO: This is very inefficient, packets can be lost
+    # XXX: This is very inefficient, packets can be lost,
+    #      but this is a faily simple and good implementation.
     pcap_object = pcap.pcap(name=device, timeout_ms=packet_timeout_ms)
     pcap_object.setfilter(bpf_filter)
     for packet in pcap_object:
